@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Management</title>
+</head>
+<body>
+    <h1>Existing Users</h1>
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>Username</th>
+            <th>Access</th>
+            <th>Minecraft Role</th>
+        </tr>
+        {% for username, data in users.items() %}
+        <tr>
+            <td>{{ username }}</td>
+            <td>{{ data.access }}</td>
+            <td>{{ data.mcrole }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <a href="{{ url_for('auth.create_user') }}">➕ Create New User</a>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create User</title>
+</head>
+<body>
+    <h1>Create New User</h1>
+    <form method="post">
+        <label for="username">Username:</label><br>
+        <input type="text" name="username" required><br><br>
+
+        <label for="password">Password:</label><br>
+        <input type="password" name="password" required><br><br>
+
+        <label for="access">Service Access:</label><br>
+        <select name="access" required>
+            <option value="minecraft">Minecraft</option>
+            <option value="git">Git</option>
+        </select><br><br>
+
+        <label for="mcrole">Minecraft Role:</label><br>
+        <select name="mcrole" required>
+            <option value="admin">Admin</option>
+            <option value="viewer">Viewer</option>
+        </select><br><br>
+
+        <button type="submit">Create User</button>
+    </form>
+    <br>
+    <a href="{{ url_for('auth.manage_users') }}">Back to User List</a>
+</body>
+</html>

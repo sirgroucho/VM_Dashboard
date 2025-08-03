@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Secrets
+secrets/*
+*.env
+*.key
+*.pem
+*.crt
+*.jks
+*.p12
+*.json  # if you ever write secret config files elsewhere
+
+# Logs and junk
+*.log
+*.bak
+*.tmp
+*.swp
+
+# Editor files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

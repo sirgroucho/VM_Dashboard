@@ -1,0 +1,116 @@
+/* Reset & base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: "Helvetica Neue", sans-serif;
+    background: #f0f2f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  /* Layout */
+  .login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .login-card {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  /* Title */
+  .title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.8rem;
+    text-align: center;
+    color: #222;
+  }
+  
+  /* Form */
+  .login-form .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.2rem;
+  }
+  
+  .login-form label {
+    margin-bottom: 0.4rem;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .login-form input,
+  .login-form select {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: border 0.2s ease;
+  }
+  
+  .login-form input:focus,
+  .login-form select:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  
+  /* Button */
+  .login-btn {
+    margin-top: 1rem;
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+    border: none;
+    padding: 0.8rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .login-btn:hover {
+    background-color: #0056b3;
+  }
+  .flash-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: auto;
+  }
+  
+  .flash-message {
+    background-color: #ffe0e0;
+    border: 1px solid #ff9999;
+    color: #900;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    animation: fadeout 4s ease forwards;
+  }
+  
+  /* Fade-out animation */
+  @keyframes fadeout {
+    0%   { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { opacity: 0; visibility: hidden; }
+  }
+  

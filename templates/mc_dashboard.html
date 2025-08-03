@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minecraft Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/dashboard.css') }}">
+  <script src="{{ url_for('static', filename='script/dashboard.js') }}"></script>
+
+</head>
+<body>
+  <header class="navbar">
+    <div class="world-name">🌍 World: Survival_1</div>
+
+    <div class="user-dropdown">
+      <button class="dropdown-toggle">☰</button>
+      <div class="dropdown-menu">
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+        {% if session.get("mcrole") == "admin" %}
+          <a href="{{ url_for('auth.manage_users') }}">Manage Users</a>
+          <a href="{{ url_for('auth.create_user') }}">Create User</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-content">
+    <h2>Welcome, {{ session.get('username', 'Player') }}!</h2>
+    <!-- Add content like player status, server logs, etc. -->
+  </main>
+</body>
+</html>
