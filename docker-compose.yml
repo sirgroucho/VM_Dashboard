@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  vm-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    # mount secrets so your load_dotenv('secrets/.env') works
+    volumes:
+      - ./secrets:/secrets:ro
+      - ./secrets:/app/secrets:ro
+    # simple healthcheck against the root path for now
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/"]
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
