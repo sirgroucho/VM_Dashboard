@@ -3,6 +3,8 @@ from flask import Flask
 from dotenv import load_dotenv
 from routes.auth import auth_bp
 from routes.minecraft import mc_bp
+from routes.ingest import ingest_bp
+
 from datetime import timedelta
 from werkzeug.middleware.proxy_fix import ProxyFix
 
@@ -27,6 +29,7 @@ app.config.update(
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(mc_bp)
+app.register_blueprint(ingest_bp)
 
 if __name__ == "__main__":
     debug_mode = os.getenv("FLASK_ENV") == "development"

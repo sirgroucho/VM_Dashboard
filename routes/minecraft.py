@@ -1,27 +1,16 @@
-from flask import Blueprint, session, render_template, request, jsonify
-from utils.signal_log import store_event, get_events
-from utils.mod_update_trigger import send_update_to_homelab
+# routes/mc.py
+from flask import Blueprint, jsonify, render_template
+from decorators import minecraft_login_required
+from utils.live_store import get_snapshot, get_players_series
 
 mc_bp = Blueprint("mc", __name__, url_prefix="/mc")
-
-from decorators import minecraft_login_required  # if in another file
 
 @mc_bp.route("/dashboard")
 @minecraft_login_required
 def dashboard():
-    events = get_events()
-    return render_template("mc_dashboard.html", events=events)
+    return render_template("mc_dashboard.html")
 
-@mc_bp.route("/signal", methods=["POST"])
+@mc_bp.route("/live.json")
 @minecraft_login_required
-def signal():
-    data = request.json
-    store_event(data)
-    return jsonify({"status": "ok"}), 200
-
-@mc_bp.route("/update_modpack", methods=["POST"])
-@minecraft_login_required
-def update_modpack():
-    version = request.form.get("version")
-    success = send_update_to_homelab(version)
-    return jsonify({"status": "sent" if success else "failed"})
+def live_json():
+    return jsonify({"snapshot": get_snapshot(), "players_series": get_players_series()})

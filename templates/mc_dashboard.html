@@ -4,11 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minecraft Dashboard</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style/dashboard.css') }}">
-  <script src="{{ url_for('static', filename='script/dashboard.js') }}"></script>
 
+  <!-- Keep your existing static assets -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/dashboard.css') }}">
+  <script defer src="{{ url_for('static', filename='script/dashboard.js') }}"></script>
 </head>
 <body>
+  <!-- Top Nav (kept as requested) -->
   <header class="navbar">
     <div class="world-name">🌍 World: Survival_1</div>
 
@@ -24,9 +26,62 @@
     </div>
   </header>
 
+  <!-- Main content -->
   <main class="dashboard-content">
     <h2>Welcome, {{ session.get('username', 'Player') }}!</h2>
-    <!-- Add content like player status, server logs, etc. -->
+
+    <!-- Live snapshot cards -->
+    <section class="cards-grid">
+      <article class="card">
+        <p class="card-label">Players Online</p>
+        <h3 id="players" class="card-value">—</h3>
+        <p class="card-sub">Last update: <span id="last-update">—</span></p>
+      </article>
+
+      <article class="card">
+        <p class="card-label">Latency</p>
+        <h3 id="latency" class="card-value">—</h3>
+        <p class="card-sub">ms (agent → server)</p>
+      </article>
+
+      <article class="card">
+        <p class="card-label">Server Version</p>
+        <h3 id="version" class="card-value">—</h3>
+        <p id="motd" class="card-sub mono">—</p>
+      </article>
+
+      <article class="card">
+        <p class="card-label">Agent</p>
+        <h3 id="agent" class="card-value">Beelink</h3>
+        <p id="ts-ago" class="card-sub">—</p>
+      </article>
+    </section>
+
+    <!-- Chart + Events -->
+    <section class="main-grid">
+      <article class="card chart-card">
+        <div class="card-header">
+          <h3>Players Online (live)</h3>
+          <span class="muted">Polling /mc/live.json every 5s</span>
+        </div>
+        <canvas id="playersLine"></canvas>
+      </article>
+
+      <article class="card events-card">
+        <div class="card-header">
+          <h3>Recent Events</h3>
+        </div>
+        <div class="events" id="events"></div>
+      </article>
+    </section>
+
+    <!-- Dynamic Key/Value dump -->
+    <section class="card">
+      <div class="card-header">
+        <h3>Snapshot Details</h3>
+      </div>
+      <div class="kvs" id="kvs"></div>
+    </section>
   </main>
 </body>
 </html>

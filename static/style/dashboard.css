@@ -1,67 +1,164 @@
+:root {
+  --bg: #0f1115;
+  --card-bg: #171a21;
+  --muted: #a0a8b8;
+  --text: #e9edf5;
+  --accent: #6aa6ff;
+  --good: #3cc76a;
+  --warn: #ffb020;
+  --bad: #ff5c71;
+  --radius: 10px;
+  --shadow: 0 4px 16px rgba(0,0,0,.2);
+}
+
 body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f9f9f9;
-  }
-  
-  /* Top navbar */
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #2d3748;
-    color: #fff;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  }
-  
-  .world-name {
-    font-size: 1.2rem;
-    font-weight: 500;
-  }
-  
-  .user-dropdown {
-    position: relative;
-  }
-  
-  .dropdown-toggle {
-    background: none;
-    border: none;
-    font-size: 1.4rem;
-    color: #fff;
-    cursor: pointer;
-  }
-  
-  .dropdown-menu {
-    position: absolute;
-    right: 0;
-    top: 2.5rem;
-    background-color: #fff;
-    color: #333;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    display: none;
-    flex-direction: column;
-    min-width: 180px;
-    z-index: 1000;
-  }
-  
-  .dropdown-menu.visible {
-    display: flex;
-  }
-  
-  .dropdown-menu a {
-    padding: 0.8rem 1rem;
-    text-decoration: none;
-    color: inherit;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .dropdown-menu a:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .dashboard-content {
-    padding: 2rem;
-  }
-  
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+.world-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.user-dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 8px 14px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.dropdown-menu a:hover {
+  background: rgba(255,255,255,.05);
+}
+
+.user-dropdown.open .dropdown-menu {
+  display: block;
+}
+
+.dashboard-content {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.card-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.card-value {
+  margin: 0.2rem 0;
+  font-size: 1.8rem;
+}
+
+.card-sub {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.evt {
+  background: #1b1f27;
+  padding: 8px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.pill {
+  padding: 2px 6px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  background: rgba(255,255,255,.05);
+}
+
+.pill.join { background: rgba(60,199,106,.15); color: var(--good); }
+.pill.leave { background: rgba(255,92,113,.15); color: var(--bad); }
+.pill.metrics { background: rgba(106,166,255,.15); color: var(--accent); }
+
+.kvs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kv {
+  display: flex;
+  justify-content: space-between;
+  background: #1b1f27;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+}
