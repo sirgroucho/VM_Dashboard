@@ -14,7 +14,7 @@ COOLDOWN_SECONDS = 10
 
 auth_bp = Blueprint('auth', __name__)
 
-secrets_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "secrets", "users.json"))
+secrets_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "userdata", "users.json"))
 
 
 # --- Helper functions ---

@@ -3,8 +3,24 @@ import json
 from getpass import getpass
 from werkzeug.security import generate_password_hash
 
+
 # Where to store the output file
 USER_FILE = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "secrets", "users.json"))
+
+import os, json, io
+
+# create empty JSON if missing or 0-byte
+if (not os.path.exists(USER_FILE)) or os.stat(USER_FILE).st_size == 0:
+    os.makedirs(os.path.dirname(USER_FILE), exist_ok=True)
+    with open(USER_FILE, "w", encoding="utf-8") as f:
+        json.dump({}, f)
+
+# load, but tolerate junk/empty
+try:
+    with open(USER_FILE, "r", encoding="utf-8") as f:
+        users = json.load(f)
+except json.JSONDecodeError:
+    users = {}
 
 def main():
     print("🛠  Create a new user for the dashboard")
