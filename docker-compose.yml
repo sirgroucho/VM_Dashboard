@@ -28,10 +28,13 @@ services:
     restart: unless-stopped
 
   certbot:
-    image: infinityofspace/certbot_dns_porkbun:latest
+    build:
+      context: ./docker/certbot        # see Dockerfile below
     container_name: certbot
     volumes:
-      - ./nginx/letsencrypt:/etc/letsencrypt
+      - ./letsencrypt:/etc/letsencrypt
+      - ./secrets:/secrets:ro          # <-- porkbun.ini lives here
+      - /var/lib/letsencrypt:/var/lib/letsencrypt
+      - /var/log/letsencrypt:/var/log/letsencrypt
     restart: "no"
-
 
