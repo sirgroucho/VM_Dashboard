@@ -1,7 +1,8 @@
+.git
 secrets/
-.env
-.env.*
-.venv
+nginx/letsencrypt/
+nginx/www/
 __pycache__/
 *.pyc
-.git
+*.pyo
+

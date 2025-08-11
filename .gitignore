@@ -10,7 +10,20 @@ secrets/*
 *.crt
 *.jks
 *.p12
-*.json  # if you ever write secret config files elsewhere
+*.json  
+.env
+.env.*
+
+# Private keys/certs anywhere
+*.pem
+*.key
+*.crt
+*.cer
+*.der
+
+
+#nginx
+nginx/letsencrypt/*
 
 # Logs and junk
 *.log
