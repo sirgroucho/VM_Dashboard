@@ -5,4 +5,5 @@ nginx/www/
 __pycache__/
 *.pyc
 *.pyo
-
+letsencrypt/
+userdata/
