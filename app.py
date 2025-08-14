@@ -4,10 +4,10 @@ from dotenv import load_dotenv
 from routes.auth import auth_bp
 from routes.minecraft import mc_bp
 from routes.ingest import ingest_bp
+from routes.logs import logs_bp
 
 from datetime import timedelta
 from werkzeug.middleware.proxy_fix import ProxyFix
-
 
 # Load environment variables from secrets/.env
 load_dotenv(dotenv_path='secrets/.env')
@@ -15,7 +15,6 @@ load_dotenv(dotenv_path='secrets/.env')
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')  # Read from env file
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1, x_prefix=1)
-
 
 app.config['SESSION_PERMANENT'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=5)
@@ -26,10 +25,18 @@ app.config.update(
     REMEMBER_COOKIE_SECURE=True,
 )
 
+# Initialize database
+from models import init_db
+init_db()
+
+# Start retention service
+from services.retention import retention_service
+retention_service.start()
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(mc_bp)
 app.register_blueprint(ingest_bp)
+app.register_blueprint(logs_bp)
 
 if __name__ == "__main__":
     debug_mode = os.getenv("FLASK_ENV") == "development"

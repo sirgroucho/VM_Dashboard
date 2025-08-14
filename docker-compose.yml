@@ -5,9 +5,10 @@ services:
     build: .
     container_name: vm_dashboard
     env_file:
-      - secrets/secrets.env
+      - secrets/secret.env
     volumes:
       - ./userdata:/app/userdata
+      - ./data:/app/data
     expose:
       - "8000"
     restart: unless-stopped

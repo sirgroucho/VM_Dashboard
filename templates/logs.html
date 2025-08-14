@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logs Dashboard - Marx-Tec</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dashboard.css') }}">
+    <style>
+        .logs-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .filters-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .filters-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-group label {
+            font-weight: 600;
+            font-size: 14px;
+            color: #495057;
+        }
+        
+        .filter-group input,
+        .filter-group select {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .filter-group input[type="date"] {
+            min-width: 140px;
+        }
+        
+        .filter-group input[type="text"] {
+            min-width: 200px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .live-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .live-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #dc3545;
+            animation: pulse 2s infinite;
+        }
+        
+        .live-indicator.active {
+            background-color: #28a745;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .logs-table th {
+            background-color: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .logs-table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: top;
+        }
+        
+        .logs-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .severity-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .severity-DEBUG { background-color: #e9ecef; color: #6c757d; }
+        .severity-INFO { background-color: #d1ecf1; color: #0c5460; }
+        .severity-WARN { background-color: #fff3cd; color: #856404; }
+        .severity-ERROR { background-color: #f8d7da; color: #721c24; }
+        
+        .message-cell {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .message-cell:hover {
+            white-space: normal;
+            word-break: break-word;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .pagination button:hover:not(:disabled) {
+            background-color: #f8f9fa;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .pagination-info {
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #aaa;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .log-details {
+            margin-bottom: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #f8f9fa;
+            padding-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            width: 120px;
+            color: #495057;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: #212529;
+        }
+        
+        .metadata-section {
+            margin-top: 20px;
+        }
+        
+        .metadata-json {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 20px 0;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="logs-container">
+        <h1>Logs Dashboard</h1>
+        
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <form id="filters-form">
+                <div class="filters-row">
+                    <div class="filter-group">
+                        <label for="since">Since</label>
+                        <input type="date" id="since" name="since">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="until">Until</label>
+                        <input type="date" id="until" name="until">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="server_id">Server</label>
+                        <select id="server_id" name="server_id">
+                            <option value="">All Servers</option>
+                            {% for server in servers %}
+                            <option value="{{ server }}">{{ server }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="event_type">Event Type</label>
+                        <select id="event_type" name="event_type">
+                            <option value="">All Types</option>
+                            {% for event_type in event_types %}
+                            <option value="{{ event_type }}">{{ event_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="severity">Severity</label>
+                        <select id="severity" name="severity">
+                            <option value="">All Severities</option>
+                            {% for severity in severities %}
+                            <option value="{{ severity }}">{{ severity }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="search">Search</label>
+                        <input type="text" id="search" name="q" placeholder="Search in messages...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <button type="submit" class="btn btn-primary">Apply Filters</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Controls Row -->
+        <div class="controls-row">
+            <div class="live-toggle">
+                <div class="live-indicator" id="live-indicator"></div>
+                <label>
+                    <input type="checkbox" id="live-toggle"> Live Updates
+                </label>
+            </div>
+            
+            <div class="pagination-info" id="pagination-info">
+                Showing 0 of 0 logs
+            </div>
+        </div>
+        
+        <!-- Logs Table -->
+        <div class="table-container">
+            <table class="logs-table">
+                <thead>
+                    <tr>
+                        <th>Time (Local)</th>
+                        <th>Server</th>
+                        <th>Severity</th>
+                        <th>Type</th>
+                        <th>Message</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="logs-tbody">
+                    <tr>
+                        <td colspan="6" class="loading">Loading logs...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        <div class="pagination" id="pagination">
+            <button id="prev-btn" onclick="previousPage()" disabled>Previous</button>
+            <span id="page-info">Page 1</span>
+            <button id="next-btn" onclick="nextPage()" disabled>Next</button>
+        </div>
+    </div>
+    
+    <!-- Log Details Modal -->
+    <div id="log-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Log Details</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div id="modal-body">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let currentPage = 1;
+        let currentFilters = {};
+        let isLiveMode = false;
+        let eventSource = null;
+        let autoScroll = true;
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLogs();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            // Filters form
+            document.getElementById('filters-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                currentPage = 1;
+                loadLogs();
+            });
+            
+            // Live toggle
+            document.getElementById('live-toggle').addEventListener('change', function(e) {
+                isLiveMode = e.target.checked;
+                if (isLiveMode) {
+                    startLiveUpdates();
+                } else {
+                    stopLiveUpdates();
+                }
+            });
+            
+            // Table hover for auto-scroll control
+            document.getElementById('logs-tbody').addEventListener('mouseenter', function() {
+                autoScroll = false;
+            });
+            
+            document.getElementById('logs-tbody').addEventListener('mouseleave', function() {
+                autoScroll = true;
+            });
+        }
+        
+        function loadLogs() {
+            const tbody = document.getElementById('logs-tbody');
+            tbody.innerHTML = '<tr><td colspan="6" class="loading">Loading logs...</td></tr>';
+            
+            // Build query string
+            const params = new URLSearchParams({
+                page: currentPage,
+                page_size: 50,
+                ...currentFilters
+            });
+            
+            fetch(`/api/logs?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+                    
+                    displayLogs(data.items);
+                    updatePagination(data.page, data.page_size, data.total, data.has_next);
+                    updatePaginationInfo(data.total);
+                })
+                .catch(error => {
+                    showError('Failed to load logs: ' + error.message);
+                });
+        }
+        
+        function displayLogs(logs) {
+            const tbody = document.getElementById('logs-tbody');
+            
+            if (logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="loading">No logs found</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = logs.map(log => `
+                <tr data-log-id="${log.id}">
+                    <td title="${log.ts}">${formatLocalTime(log.ts)}</td>
+                    <td>${escapeHtml(log.server_id)}</td>
+                    <td><span class="severity-badge severity-${log.severity}">${log.severity}</span></td>
+                    <td>${escapeHtml(log.event_type)}</td>
+                    <td class="message-cell" title="${escapeHtml(log.message)}">${escapeHtml(log.message)}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="showLogDetails(${log.id})">Details</button>
+                        <button class="btn btn-secondary" onclick="copyLogJson(${JSON.stringify(log).replace(/"/g, '&quot;')})">Copy JSON</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function formatLocalTime(utcTime) {
+            try {
+                const date = new Date(utcTime);
+                return date.toLocaleString();
+            } catch (e) {
+                return utcTime;
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        function updatePagination(page, pageSize, total, hasNext) {
+            document.getElementById('page-info').textContent = `Page ${page}`;
+            document.getElementById('prev-btn').disabled = page <= 1;
+            document.getElementById('next-btn').disabled = !hasNext;
+        }
+        
+        function updatePaginationInfo(total) {
+            document.getElementById('pagination-info').textContent = `Showing ${total} total logs`;
+        }
+        
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                loadLogs();
+            }
+        }
+        
+        function nextPage() {
+            currentPage++;
+            loadLogs();
+        }
+        
+        function clearFilters() {
+            document.getElementById('filters-form').reset();
+            currentFilters = {};
+            currentPage = 1;
+            loadLogs();
+        }
+        
+        function startLiveUpdates() {
+            if (eventSource) {
+                eventSource.close();
+            }
+            
+            // Build filters for SSE
+            const sseParams = new URLSearchParams();
+            if (currentFilters.server_id) sseParams.append('server_id', currentFilters.server_id);
+            if (currentFilters.event_type) sseParams.append('event_type', currentFilters.event_type);
+            if (currentFilters.severity) sseParams.append('severity', currentFilters.severity);
+            
+            const url = `/stream/logs${sseParams.toString() ? '?' + sseParams.toString() : ''}`;
+            eventSource = new EventSource(url);
+            
+            eventSource.onopen = function() {
+                document.getElementById('live-indicator').classList.add('active');
+            };
+            
+            eventSource.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.type === 'connected') {
+                    console.log('SSE connected:', data.client_id);
+                } else {
+                    // New log event
+                    prependLogEvent(data);
+                }
+            };
+            
+            eventSource.onerror = function(error) {
+                console.error('SSE error:', error);
+                document.getElementById('live-indicator').classList.remove('active');
+            };
+        }
+        
+        function stopLiveUpdates() {
+            if (eventSource) {
+                eventSource.close();
+                eventSource = null;
+            }
+            document.getElementById('live-indicator').classList.remove('active');
+        }
+        
+        function prependLogEvent(log) {
+            const tbody = document.getElementById('logs-tbody');
+            const firstRow = tbody.querySelector('tr');
+            
+            // Remove loading row if present
+            if (firstRow && firstRow.querySelector('.loading')) {
+                firstRow.remove();
+            }
+            
+            // Create new row
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td title="${log.ts}">${formatLocalTime(log.ts)}</td>
+                <td>${escapeHtml(log.server_id)}</td>
+                <td><span class="severity-badge severity-${log.severity}">${log.severity}</span></td>
+                <td>${escapeHtml(log.event_type)}</td>
+                <td class="message-cell" title="${escapeHtml(log.message)}">${escapeHtml(log.message)}</td>
+                <td>
+                    <button class="btn btn-primary" onclick="showLogDetails(${log.id || 'null'})">Details</button>
+                    <button class="btn btn-secondary" onclick="copyLogJson(${JSON.stringify(log).replace(/"/g, '&quot;')})">Copy JSON</button>
+                </td>
+            `;
+            
+            // Prepend to table
+            tbody.insertBefore(newRow, tbody.firstChild);
+            
+            // Auto-scroll if enabled
+            if (autoScroll) {
+                newRow.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            
+            // Limit table size to prevent memory issues
+            const rows = tbody.querySelectorAll('tr');
+            if (rows.length > 100) {
+                rows[rows.length - 1].remove();
+            }
+        }
+        
+        function showLogDetails(logId) {
+            if (!logId) {
+                alert('Log ID not available for live events');
+                return;
+            }
+            
+            fetch(`/api/logs/${logId}`)
+                .then(response => response.json())
+                .then(log => {
+                    if (log.error) {
+                        alert('Error loading log details: ' + log.error);
+                        return;
+                    }
+                    
+                    displayLogModal(log);
+                })
+                .catch(error => {
+                    alert('Failed to load log details: ' + error.message);
+                });
+        }
+        
+        function displayLogModal(log) {
+            const modal = document.getElementById('log-modal');
+            const modalBody = document.getElementById('modal-body');
+            
+            modalBody.innerHTML = `
+                <div class="log-details">
+                    <div class="detail-row">
+                        <span class="detail-label">ID:</span>
+                        <span class="detail-value">${log.id}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Server:</span>
+                        <span class="detail-value">${escapeHtml(log.server_id)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Host:</span>
+                        <span class="detail-value">${escapeHtml(log.host)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Source:</span>
+                        <span class="detail-value">${escapeHtml(log.source)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Event Type:</span>
+                        <span class="detail-value">${escapeHtml(log.event_type)}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Severity:</span>
+                        <span class="detail-value">
+                            <span class="severity-badge severity-${log.severity}">${log.severity}</span>
+                        </span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Time (UTC):</span>
+                        <span class="detail-value">${log.ts}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Message:</span>
+                        <span class="detail-value">${escapeHtml(log.message)}</span>
+                    </div>
+                </div>
+                
+                ${log.metadata ? `
+                <div class="metadata-section">
+                    <h3>Metadata</h3>
+                    <div class="metadata-json">${JSON.stringify(log.metadata, null, 2)}</div>
+                </div>
+                ` : ''}
+            `;
+            
+            modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('log-modal').style.display = 'none';
+        }
+        
+        function copyLogJson(jsonStr) {
+            navigator.clipboard.writeText(jsonStr).then(function() {
+                // Show temporary success message
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                btn.classList.add('btn-success');
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('btn-success');
+                }, 2000);
+            }).catch(function(err) {
+                alert('Failed to copy: ' + err);
+            });
+        }
+        
+        function showError(message) {
+            const tbody = document.getElementById('logs-tbody');
+            tbody.innerHTML = `<tr><td colspan="6" class="error">${escapeHtml(message)}</td></tr>`;
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('log-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+        
+        // Update filters when form changes
+        document.querySelectorAll('#filters-form input, #filters-form select').forEach(input => {
+            input.addEventListener('change', function() {
+                const formData = new FormData(document.getElementById('filters-form'));
+                currentFilters = {};
+                for (let [key, value] of formData.entries()) {
+                    if (value) {
+                        currentFilters[key] = value;
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
