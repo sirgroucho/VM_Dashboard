@@ -139,6 +139,8 @@ make docker-down
 - **HMAC Authentication**: All agent requests must be signed
 - **Rate Limiting**: 60 requests/minute per server
 - **Input Validation**: All inputs sanitized and validated
+- **RBAC Permissions**: Fine-grained access control with `logs:view` and `logs:stream` permissions
+- **Role-Based Access**: Backward compatible with existing `mcrole` system
 - **RBAC**: Role-based access control for users
 - **HTTPS**: Use behind nginx with TLS in production
 

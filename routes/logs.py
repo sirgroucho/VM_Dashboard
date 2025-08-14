@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 from models import LogEvent, get_db, SessionLocal
 from services.authsig import verify_hmac_signature, validate_timestamp
 from services.logbus import log_event_bus
-from decorators import login_required
+from decorators import require_perm
 
 logs_bp = Blueprint('logs', __name__)
 
@@ -26,16 +26,7 @@ limiter = Limiter(
 AGENT_KEY = os.getenv('AGENT_KEY', '').encode()
 LOG_RETENTION_DAYS = int(os.getenv('LOG_RETENTION_DAYS', '30'))
 
-def check_role_access(required_role: str = 'viewer') -> bool:
-    """Check if user has required role access."""
-    if not session.get('logged_in'):
-        return False
-    
-    user_role = session.get('mcrole', 'viewer')
-    if required_role == 'admin' and user_role != 'admin':
-        return False
-    
-    return user_role in ['admin', 'viewer']
+# Role checking function removed - now using permission decorators
 
 def sanitize_message(message: str) -> str:
     """Sanitize message to prevent HTML injection."""
@@ -63,11 +54,9 @@ def parse_datetime(date_str: str) -> Optional[datetime]:
     return None
 
 @logs_bp.route("/logs")
-@login_required
+@require_perm("logs:view")
 def logs_page():
     """Logs page with filters and table."""
-    if not check_role_access('viewer'):
-        return "Access denied", 403
     
     # Get available servers and event types for dropdowns
     db = SessionLocal()
@@ -87,11 +76,9 @@ def logs_page():
                          severities=severities)
 
 @logs_bp.route("/api/logs")
-@login_required
+@require_perm("logs:view")
 def get_logs():
     """Get logs with filtering and pagination."""
-    if not check_role_access('viewer'):
-        return jsonify({"error": "Access denied"}), 403
     
     # Parse query parameters
     page = max(1, int(request.args.get('page', 1)))
@@ -153,11 +140,9 @@ def get_logs():
         db.close()
 
 @logs_bp.route("/api/logs/<int:log_id>")
-@login_required
+@require_perm("logs:view")
 def get_log(log_id: int):
     """Get a single log entry by ID."""
-    if not check_role_access('viewer'):
-        return jsonify({"error": "Access denied"}), 403
     
     db = SessionLocal()
     try:
@@ -286,11 +271,9 @@ def ingest_logs():
         db.close()
 
 @logs_bp.route("/stream/logs")
-@login_required
+@require_perm("logs:stream")
 def stream_logs():
     """Server-Sent Events stream for real-time logs."""
-    if not check_role_access('viewer'):
-        return "Access denied", 403
     
     # Get filters from query params
     filters = {}
@@ -344,11 +327,9 @@ def stream_logs():
     )
 
 @logs_bp.route("/api/logs/stats")
-@login_required
+@require_perm("logs:view")
 def get_log_stats():
     """Get log statistics for dashboard."""
-    if not check_role_access('viewer'):
-        return jsonify({"error": "Access denied"}), 403
     
     db = SessionLocal()
     try:

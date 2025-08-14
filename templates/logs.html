@@ -407,8 +407,23 @@
                     </tr>
                 </thead>
                 <tbody id="logs-tbody">
-                    <tr>
+                    <tr class="loading-row">
                         <td colspan="6" class="loading">Loading logs...</td>
+                    </tr>
+                    <tr class="empty-row" style="display: none;">
+                        <td colspan="6" class="empty-state">
+                            <div style="text-align: center; padding: 40px 20px; color: #6c757d;">
+                                <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
+                                <h3 style="margin: 0 0 8px 0; color: #495057;">No logs found</h3>
+                                <p style="margin: 0; font-size: 14px;">
+                                    {% if current_filters %}
+                                        Try adjusting your filters or check back later.
+                                    {% else %}
+                                        Logs will appear here once they are ingested.
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -509,9 +524,15 @@
             const tbody = document.getElementById('logs-tbody');
             
             if (logs.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="loading">No logs found</td></tr>';
+                // Show empty state
+                tbody.querySelector('.loading-row').style.display = 'none';
+                tbody.querySelector('.empty-row').style.display = 'table-row';
                 return;
             }
+            
+            // Hide empty state and show logs
+            tbody.querySelector('.loading-row').style.display = 'none';
+            tbody.querySelector('.empty-row').style.display = 'none';
             
             tbody.innerHTML = logs.map(log => `
                 <tr data-log-id="${log.id}">

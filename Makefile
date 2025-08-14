@@ -11,8 +11,11 @@ install: ## Install Python dependencies
 run: ## Run the Flask development server
 	python app.py
 
-test: ## Run tests (placeholder)
-	@echo "Tests not yet implemented"
+test: ## Run tests
+	@echo "Testing logging system..."
+	@python test_logging.py
+	@echo "Testing permission system..."
+	@python test_permissions.py
 
 clean: ## Clean up temporary files
 	find . -type f -name "*.pyc" -delete

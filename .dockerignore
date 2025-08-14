@@ -7,3 +7,11 @@ __pycache__/
 *.pyo
 letsencrypt/
 userdata/
+
+# Development and testing
+scripts/
+test_*.py
+*.md
+docs/
+Makefile
+README_LOGGING.md

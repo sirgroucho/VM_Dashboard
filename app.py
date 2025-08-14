@@ -33,6 +33,13 @@ init_db()
 from services.retention import retention_service
 retention_service.start()
 
+# Register template helpers
+from utils.template_helpers import has_permission, get_user_data_from_session
+app.jinja_env.globals.update(
+    has_permission=has_permission,
+    get_user_data_from_session=get_user_data_from_session
+)
+
 app.register_blueprint(auth_bp)
 app.register_blueprint(mc_bp)
 app.register_blueprint(ingest_bp)

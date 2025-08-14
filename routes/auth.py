@@ -24,12 +24,12 @@ def load_users():
         return json.load(f)
 
 def save_users(users):
-    os.makedirs(os.path.dirname(USERS_JSON), exist_ok=True)
-    tmp = USERS_JSON + ".tmp"
+    os.makedirs(os.path.dirname(secrets_path), exist_ok=True)
+    tmp = secrets_path + ".tmp"
     with open(tmp, "w") as f:
         json.dump(users, f, indent=2)
         f.flush(); os.fsync(f.fileno())
-    os.replace(tmp, USERS_JSON)
+    os.replace(tmp, secrets_path)
 
 
 # --- Login Route ---
