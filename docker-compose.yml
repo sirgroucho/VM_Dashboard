@@ -8,6 +8,9 @@ services:
       - secrets/secrets.env
     volumes:
       - ./userdata:/app/userdata
+      - /srv/vm_dashboard/data:/data
+      - /srv/shared/nginx-acl:/nginx-acl:rw
+
     expose:
       - "8000"
     restart: unless-stopped
@@ -24,7 +27,9 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/streams:/etc/nginx/streams
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./nginx/letsencrypt:/etc/letsencrypt
+      - ./letsencrypt:/etc/letsencrypt
+      - /srv/shared/nginx-acl:/etc/nginx/acl:ro
+
     restart: unless-stopped
 
   certbot:
